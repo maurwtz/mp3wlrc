@@ -3,6 +3,9 @@ const lyricElement = document.querySelector('.lyric');
 const nextLyricElement = document.querySelector('.next-lyric');
 const play = document.querySelector('.play');
 const time = document.querySelector('.time');
+const pause = document.querySelector('.pause');
+const continueBtn = document.querySelector('.continue');
+
 const progresses = Array.from(document.querySelectorAll('.progress'));
 let currentIndex = 0;
 
@@ -11,6 +14,22 @@ play.addEventListener('click', () => {
   audio.play();
   play.style.opacity = '0';
   play.style.pointerEvents = 'none';
+});
+
+pause.addEventListener('click', () => {
+  audio.pause();
+  pause.style.pointerEvents = 'none';
+  continueBtn.style.pointerEvents = 'auto';
+});
+
+continueBtn.addEventListener('click', () => {
+  audio.play();
+  pause.style.pointerEvents = 'auto';
+  continueBtn.style.pointerEvents = 'none';
+});
+
+audio.addEventListener('playing', () => {
+  start(audio.src.replace('.mp3', '.lrc'), audio.currentTime);
 });
 
 audio.addEventListener('playing', start);
@@ -97,6 +116,6 @@ audio.addEventListener('timeupdate', () => {
 });
 
 audio.addEventListener('pause', () => {
-  lyricElement.innerText = '';
-  nextLyricElement.innerText = '';
+  //lyricElement.innerText = ''; //mejor seguir mostrando la letra
+  //nextLyricElement.innerText = '';
 });
