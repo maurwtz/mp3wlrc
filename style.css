@@ -90,6 +90,7 @@ html, body {
   background-color: yellow;
 }
 
+/*
 .play {
   background: none;
   border-top: 50px solid transparent;
@@ -99,7 +100,7 @@ html, body {
   z-index: 10;
   cursor: pointer;
   transition: .5s ease-in-out;
-}
+}*/
 
 .time {
   position: absolute;

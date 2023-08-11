@@ -3,22 +3,26 @@ const lyricElement = document.querySelector('.lyric');
 const nextLyricElement = document.querySelector('.next-lyric');
 const play = document.querySelector('.play');
 const time = document.querySelector('.time');
-const pause = document.querySelector('.pause');
+const pauseBtn = document.querySelector('.pause');
+const stopBtn = document.querySelector('.stop');
 const continueBtn = document.querySelector('.continue');
+const songSelect = document.getElementById('songSelect');
 
 const progresses = Array.from(document.querySelectorAll('.progress'));
-let currentIndex = 0;
+
+let currentLrcFileName = '';
+let intervalId;
 
 // eventos
 play.addEventListener('click', () => {
   audio.play();
-  play.style.opacity = '0';
-  play.style.pointerEvents = 'none';
+  //play.style.opacity = '0'; //para esconder, se puede clickear
+  //play.style.pointerEvents = 'none' //para no q sea mas clickeable
 });
 
-pause.addEventListener('click', () => {
+pauseBtn.addEventListener('click', () => {
   audio.pause();
-  pause.style.pointerEvents = 'none';
+  //pause.style.pointerEvents = 'none';
   continueBtn.style.pointerEvents = 'auto';
 });
 
@@ -28,8 +32,39 @@ continueBtn.addEventListener('click', () => {
   continueBtn.style.pointerEvents = 'none';
 });
 
+stopBtn.addEventListener('click', () => {
+  audio.pause();
+  audio.currentTime = 0;
+  lyricElement.innerText = '';
+  nextLyricElement.innerText = '';
+  clearInterval(intervalId);
+  currentIndex = 0;
+});
+
+
+songSelect.addEventListener('change', () => {
+  const selectedSong = songSelect.value;
+  audio.src = selectedSong;
+  audio.load();
+
+  const lrcFileName = selectedSong.replace('.mp3', '.lrc');
+  currentLrcFileName = lrcFileName; // Guardar el LRC actual
+
+  //Reiniciar timer de la cancion
+  clearInterval(intervalId);
+  currentIndex = 0;
+
+  // Nuevo intervalo con letras de la otra cancion
+  intervalId = setInterval(() => {
+    const currentTime = audio.currentTime;
+    updateLyrics(currentTime);
+  }, 200);
+});
+
 audio.addEventListener('playing', () => {
-  start(audio.src.replace('.mp3', '.lrc'), audio.currentTime);
+  if (currentLrcFileName) {
+  start(currentLrcFileName, audio.currentTime);
+  }
 });
 
 audio.addEventListener('playing', start);
@@ -46,7 +81,7 @@ async function loadFile(fileName) {
 }
 
 async function start() {
-  const lines = await loadFile('lyric.lrc');
+  const lines = await loadFile(currentLrcFileName);
 
   function updateLyrics(currentTime) {
     while (currentIndex < lines.length) {
@@ -59,6 +94,11 @@ async function start() {
       if (currentTime >= currentTimestampInfo.timestamp && currentTime < nextTimestampInfo.timestamp) {
         lyricElement.innerText = currentTimestampInfo.lyrics;
         nextLyricElement.innerText = nextTimestampInfo.lyrics;
+        break;
+      } else if (currentTime < currentTimestampInfo.timestamp) {
+        // Display blank lyrics if the current timestamp is not reached yet
+        lyricElement.innerText = '';
+        nextLyricElement.innerText = '';
         break;
       }
   
