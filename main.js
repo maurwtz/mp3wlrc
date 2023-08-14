@@ -92,7 +92,8 @@ function updateLyrics(currentTime) {
       }
 
       if (Array.isArray(nextTimestampInfo.lyrics)) {
-        nextLyricElement.innerHTML = nextTimestampInfo.lyrics[0].word;
+        const nextLyricsText = nextTimestampInfo.lyrics.map(wordInfo => wordInfo.word).join(' ');
+        nextLyricElement.innerHTML = nextLyricsText;
       } else {
         nextLyricElement.innerHTML = nextTimestampInfo.lyrics;
       }
