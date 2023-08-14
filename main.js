@@ -12,7 +12,7 @@ const progresses = Array.from(document.querySelectorAll('.progress'));
 
 let currentIndex = 0;
 let lines = [];
-let intervalId; // Add this line to declare the intervalId variable
+let intervalId; 
 
 // eventos
 play.addEventListener('click', () => {
@@ -79,11 +79,26 @@ function updateLyrics(currentTime) {
     const nextTimestampInfo = parseTimestamp(nextLine);
 
     if (currentTime >= currentTimestampInfo.timestamp && currentTime < nextTimestampInfo.timestamp) {
-      lyricElement.innerText = currentTimestampInfo.lyrics;
-      nextLyricElement.innerText = nextTimestampInfo.lyrics;
+      if (Array.isArray(currentTimestampInfo.lyrics)) {
+        const highlightedLyrics = currentTimestampInfo.lyrics.map(wordInfo => {
+          if (currentTime >= wordInfo.timestamp) {
+            return `<span class="highlight">${wordInfo.word}</span>`;
+          }
+          return wordInfo.word;
+        }).join(' ');
+        lyricElement.innerHTML = highlightedLyrics;
+      } else {
+        lyricElement.innerHTML = currentTimestampInfo.lyrics;
+      }
+
+      if (Array.isArray(nextTimestampInfo.lyrics)) {
+        nextLyricElement.innerHTML = nextTimestampInfo.lyrics[0].word;
+      } else {
+        nextLyricElement.innerHTML = nextTimestampInfo.lyrics;
+      }
+
       break;
     } else if (currentTime < currentTimestampInfo.timestamp) {
-      // Display blank lyrics if the current timestamp is not reached yet
       lyricElement.innerText = '';
       nextLyricElement.innerText = '';
       break;
@@ -104,18 +119,34 @@ function loadFile(fileName) {
   }
 }
 
+//parse
 function parseTimestamp(line) {
   const timestampMatch = line.match(/\[(\d+):(\d+\.\d+)\]/);
   if (timestampMatch) {
     const [, minute, second] = timestampMatch;
+    const lyrics = line.replace(timestampMatch[0], '').trim();
+
+    // Check if the line has word timings
+    const wordTimings = lyrics.match(/<(\d+:\d+\.\d+)>([^<]+)/g);
+    if (wordTimings) {
+      const formattedLyrics = wordTimings.map(wordTiming => {
+        const [, wordTimestamp, word] = wordTiming.match(/<(\d+:\d+\.\d+)>([^<]+)/);
+        return { timestamp: parseTimestamp(`[${wordTimestamp}]`).timestamp, word };
+      });
+
+      return {
+        timestamp: parseInt(minute) * 60 + parseFloat(second),
+        lyrics: formattedLyrics
+      };
+    }
+
     return {
       timestamp: parseInt(minute) * 60 + parseFloat(second),
-      lyrics: line.replace(timestampMatch[0], '').trim()
+      lyrics
     };
   }
   return { timestamp: 0, lyrics: '' };
 }
-
 audio.addEventListener('ended', () => {
   currentIndex = 0;
   time.innerText = '00:00';
