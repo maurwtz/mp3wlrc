@@ -87,7 +87,8 @@ html, body {
 }
 
 .highlight {
-  background-color: yellow;
+  /*background-color: yellow;*/
+  color: aqua;
 }
 
 /*
@@ -110,6 +111,11 @@ html, body {
   
 }
 
+.lyrics-container {
+  text-align: center;
+  padding: 20px;
+}
+
 .next-lyric {
   position: absolute;
   top: 60%;
@@ -122,7 +128,4 @@ body {
   font-family: Arial, sans-serif;
 }
 
-.lyrics-container {
-  text-align: center;
-  padding: 20px;
-}
+
