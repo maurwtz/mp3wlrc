@@ -1,6 +1,3 @@
 # Progress Lyric Music Player
-## Play music with circular progress bar & Read lyric file without any javascript library
+## Based on Lopiacode LMP (https://youtu.be/qNFYEWDWzM8), also reads enhanced lyrics and displays lyrics on different ways (scrolls and 2x2 lines)
 
-Watch Tutorial On Youtube 🧡: https://youtu.be/qNFYEWDWzM8
-
-![thumbnail](thumbnail.jpg)
